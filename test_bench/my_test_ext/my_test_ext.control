@@ -1,0 +1,4 @@
+default_version = '1.0'
+comment = 'Test extension'
+module_pathname = '$libdir/my_test_ext'
+relocatable = true
