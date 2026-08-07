@@ -1,8 +1,18 @@
 #!/bin/bash
 
 PG_HOME="$HOME/postgres-build"
+PG_SRC="$HOME/postgres-new"
 
 set -e
+
+echo "Собираем постгрес..."
+cd $PG_HOME
+if [ ! -f "$PG_HOME/Makefile" ]; then
+	$PG_SRC/configure --prefix=$PG_HOME/install --enable-debug
+fi
+
+make -j16
+make install
 
 if [ -d "${PG_HOME}/primary" ] && [ -f "${PG_HOME}/primary/postgresql.conf" ]; then
 	echo "Узел уже существует"
@@ -28,7 +38,10 @@ else
 	pg_ctl -D ${PG_HOME}/primary -l ${PG_HOME}/primary/logfile  start
 fi
 
-sleep 2
+until pg_isready -p 5432 -q 
+do
+	sleep 1
+done
 
 if  [ -d "${PG_HOME}/replica" ]; then
 
